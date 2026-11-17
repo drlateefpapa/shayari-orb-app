@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#6b4c9a">
+<title>Shayari Orb</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%236b4c9a'/></svg>">
+<style>
+:root { --bg: #0a0a12; --text: #f0e6d2; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: radial-gradient(ellipse at center, #1a1020 0%, var(--bg) 70%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 12px 32px;
+}
+h1 { font-weight: 300; letter-spacing: 3px; font-size: 1.5rem; margin-bottom: 4px; color: #e8d5a3; text-align: center; }
+.subtitle { font-size: 0.85rem; opacity: 0.7; margin-bottom: 20px; text-align: center; }
+.orb-container { position: relative; width: 240px; height: 240px; margin: 8px 0 24px; display: flex; align-items: center; justify-content: center; }
+.orb {
+  width: 170px; height: 170px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #ffffffcc 0%, #ffffff44 20%, transparent 45%),
+              radial-gradient(circle at center, #7c3aed, #1e1b4b);
+  box-shadow: 0 0 30px #a78bfaaa, 0 0 70px #7c3aed88, 0 0 120px #5b21b655, inset 0 0 40px #ffffff33;
+  position: relative; animation: float 5s ease-in-out infinite, breathe 3.5s ease-in-out infinite;
+  transition: all 0.5s ease; cursor: pointer; z-index: 2;
+}
+.orb::before, .orb::after { content: ''; position: absolute; border-radius: 50%; pointer-events: none; }
+.orb::before { inset: -28px; background: radial-gradient(circle, currentColor 0%, transparent 65%); opacity: 0.55; filter: blur(26px); z-index: -1; animation: glowPulse 2.8s ease-in-out infinite alternate; }
+.orb::after { inset: -50px; background: radial-gradient(circle, currentColor 0%, transparent 55%); opacity: 0.25; filter: blur(38px); z-index: -2; animation: glowPulse 3.5s ease-in-out infinite alternate-reverse; }
+.orb.romantic { background: radial-gradient(circle at 30% 25%, #fff8, transparent 40%), radial-gradient(circle, #ff4d8d, #4a0e2e); color: #ff6b9d; }
+.orb.sad { background: radial-gradient(circle at 30% 25%, #fff8, transparent 40%), radial-gradient(circle, #3b82f6, #0f1c3a); color: #60a5fa; }
+.orb.philosophical { background: radial-gradient(circle at 30% 25%, #fff8, transparent 40%), radial-gradient(circle, #eab308, #3a2a0a); color: #facc15; }
+.orb.motivational { background: radial-gradient(circle at 30% 25%, #fff8, transparent 40%), radial-gradient(circle, #22c55e, #0f2a1a); color: #4ade80; }
+.orb.humorous { background: radial-gradient(circle at 30% 25%, #fff8, transparent 40%), radial-gradient(circle, #f59e0b, #3a2505); color: #fbbf24; }
+.orb.reciting { animation: float 5s ease-in-out infinite, strongPulse 0.9s ease-in-out infinite; box-shadow: 0 0 50px currentColor, 0 0 100px currentColoraa, 0 0 160px currentColor66, inset 0 0 50px #ffffff44; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+@keyframes breathe { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+@keyframes strongPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+@keyframes glowPulse { from{opacity:0.35;transform:scale(0.95)} to{opacity:0.75;transform:scale(1.05)} }
+.mood-buttons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 520px; margin-bottom: 20px; }
+.mood-btn { background: #ffffff0d; border: 1px solid #ffffff22; color: var(--text); padding: 9px 14px; border-radius: 30px; font-size: 0.85rem; cursor: pointer; transition: all 0.25s; }
+.mood-btn:hover, .mood-btn.active { background: #ffffff1a; border-color: #ffffff44; transform: translateY(-1px); }
+.shayari-card { background: rgba(20,15,30,0.75); border: 1px solid #ffffff15; border-radius: 18px; padding: 22px 18px; max-width: 540px; width: 100%; text-align: center; backdrop-filter: blur(12px); min-height: 140px; display: flex; flex-direction: column; justify-content: center; opacity: 0; transform: translateY(12px); transition: all 0.45s ease; }
+.shayari-card.show { opacity: 1; transform: translateY(0); }
+.shayari-text { font-size: 1.28rem; line-height: 1.6; margin-bottom: 12px; white-space: pre-line; }
+.poet { font-size: 0.8rem; opacity: 0.65; font-style: italic; }
+.controls { margin-top: 16px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.ctrl-btn { background: #ffffff12; border: 1px solid #ffffff22; color: var(--text); padding: 9px 18px; border-radius: 30px; cursor: pointer; font-size: 0.85rem; }
+.ctrl-btn:hover:not(:disabled) { background: #ffffff20; }
+.ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.voice-note, .status { font-size: 0.75rem; opacity: 0.55; margin-top: 6px; text-align: center; }
+footer { margin-top: 28px; font-size: 0.7rem; opacity: 0.4; text-align: center; }
+.install-hint { margin-top: 12px; font-size: 0.75rem; opacity: 0.6; text-align: center; }
+</style>
+</head>
+<body>
+<h1>शायरी ओर्ब</h1>
+<p class="subtitle">मूड चुनो • ओर्ब चमके • शायरी सुने</p>
+
+<div class="orb-container"><div class="orb" id="orb"></div></div>
+
+<div class="mood-buttons" id="moodButtons">
+  <button class="mood-btn" data-mood="romantic">💖 रोमांटिक</button>
+  <button class="mood-btn" data-mood="sad">💙 ग़म</button>
+  <button class="mood-btn" data-mood="philosophical">✨ फ़लसफ़ा</button>
+  <button class="mood-btn" data-mood="motivational">🔥 प्रेरणा</button>
+  <button class="mood-btn" data-mood="humorous">😊 हल्की-फुल्की</button>
+  <button class="mood-btn" data-mood="random">🎲 रैंडम</button>
+</div>
+
+<div class="shayari-card" id="shayariCard">
+  <div class="shayari-text" id="shayariText">लोड हो रहा है...</div>
+  <div class="poet" id="poet"></div>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" id="reciteBtn" disabled>🔊 सुनाएं</button>
+  <button class="ctrl-btn" id="nextBtn" disabled>अगली →</button>
+  <button class="ctrl-btn" id="shareBtn" disabled>📤 शेयर</button>
+</div>
+<div class="voice-note" id="voiceNote"></div>
+<div class="status" id="status"></div>
+<p class="install-hint">होम स्क्रीन पर जोड़ने के लिए ब्राउज़र मेनू → "Add to Home Screen"</p>
+<footer>Shayari Orb • PWA • क्लासिक संग्रह</footer>
+
+<script>
+let shayaris = {};
+let currentMood = null, currentIndex = 0, currentList = [], isSpeaking = false;
+
+const orb = document.getElementById('orb');
+const card = document.getElementById('shayariCard');
+const textEl = document.getElementById('shayariText');
+const poetEl = document.getElementById('poet');
+const reciteBtn = document.getElementById('reciteBtn');
+const nextBtn = document.getElementById('nextBtn');
+const shareBtn = document.getElementById('shareBtn');
+const voiceNote = document.getElementById('voiceNote');
+const statusEl = document.getElementById('status');
+
+async function loadData() {
+  try {
+    const res = await fetch('shayaris.json');
+    shayaris = await res.json();
+    const total = Object.values(shayaris).reduce((a, b) => a + b.length, 0);
+    statusEl.textContent = `${total} शायरी लोड हो गईं`;
+    textEl.textContent = "मूड चुनें...";
+    card.classList.add('show');
+    document.querySelectorAll('.mood-btn').forEach(b => b.disabled = false);
+  } catch (e) {
+    textEl.textContent = "डेटा लोड नहीं हो पाया। इंटरनेट चेक करें।";
+    statusEl.textContent = "Error loading shayaris.json";
+  }
+}
+
+function loadVoices() {
+  const voices = speechSynthesis.getVoices();
+  if (voices.length) {
+    const hindi = voices.find(v => v.lang.startsWith('hi') || v.lang.startsWith('ur') || /hindi/i.test(v.name));
+    voiceNote.textContent = hindi ? "हिंदी वॉइस मिल गया ✓" : "हिंदी वॉइस नहीं — डिफ़ॉल्ट इस्तेमाल होगा";
+  }
+}
+if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+setTimeout(loadVoices, 300);
+
+document.querySelectorAll('.mood-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectMood(btn.dataset.mood);
+  });
+});
+
+orb.addEventListener('click', () => { if (currentMood) recite(); });
+
+function selectMood(mood) {
+  const keys = Object.keys(shayaris);
+  currentMood = mood === 'random' ? keys[Math.floor(Math.random() * keys.length)] : mood;
+  currentList = shayaris[currentMood] || shayaris.romantic || [];
+  if (!currentList.length) return;
+  currentIndex = Math.floor(Math.random() * currentList.length);
+  orb.className = 'orb ' + currentMood;
+  showShayari();
+  reciteBtn.disabled = nextBtn.disabled = shareBtn.disabled = false;
+  stopSpeech();
+}
+
+function showShayari() {
+  const item = currentList[currentIndex];
+  textEl.textContent = item.text;
+  poetEl.textContent = "— " + item.poet;
+  card.classList.remove('show');
+  setTimeout(() => card.classList.add('show'), 30);
+}
+
+nextBtn.addEventListener('click', () => {
+  if (!currentList.length) return;
+  currentIndex = (currentIndex + 1) % currentList.length;
+  showShayari();
+  stopSpeech();
+});
+
+shareBtn.addEventListener('click', async () => {
+  const text = textEl.textContent + "\n" + poetEl.textContent + "\n\n— Shayari Orb";
+  if (navigator.share) {
+    try { await navigator.share({ title: "शायरी", text }); }
+    catch (e) {}
+  } else {
+    await navigator.clipboard.writeText(text);
+    statusEl.textContent = "कॉपी हो गया!";
+    setTimeout(() => statusEl.textContent = "", 2000);
+  }
+});
+
+function recite() {
+  if (isSpeaking) { stopSpeech(); return; }
+  const text = textEl.textContent;
+  if (!text || text.includes("चुनें") || text.includes("लोड")) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "hi-IN";
+  u.rate = 0.82;
+  u.pitch = 1.05;
+  const voices = speechSynthesis.getVoices();
+  const hv = voices.find(v => v.lang.startsWith("hi") || v.lang.startsWith("ur") || /hindi/i.test(v.name));
+  if (hv) u.voice = hv;
+  u.onstart = () => { isSpeaking = true; orb.classList.add("reciting"); reciteBtn.textContent = "⏹️ रुकें"; };
+  u.onend = u.onerror = () => { isSpeaking = false; orb.classList.remove("reciting"); reciteBtn.textContent = "🔊 सुनाएं"; };
+  try { speechSynthesis.speak(u); } catch (e) { voiceNote.textContent = "वॉइस सपोर्ट नहीं"; }
+}
+
+function stopSpeech() {
+  speechSynthesis.cancel();
+  isSpeaking = false;
+  orb.classList.remove("reciting");
+  reciteBtn.textContent = "🔊 सुनाएं";
+}
+reciteBtn.addEventListener("click", recite);
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+
+loadData();
+</script>
+</body>
+</html>
